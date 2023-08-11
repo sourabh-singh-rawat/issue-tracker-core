@@ -1,8 +1,9 @@
 {
   "name": "@sourabh-singh-rawat/core-utils",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "core utilities for issue tracker microservices",
-  "main": "./src/index.js",
+  "main": "dist/index.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "test": "jest --watchAll",
     "start": "nodemon ./src/index.ts"
