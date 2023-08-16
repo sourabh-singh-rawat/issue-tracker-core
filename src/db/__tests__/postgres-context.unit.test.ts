@@ -1,7 +1,7 @@
 import { Pool } from "pg";
-import { PgContext } from "../pg-context";
+import { PostgresContext } from "../postgres-context";
 
-describe("PgContext", () => {
+describe("PostgresContext", () => {
   // Arrange
   const mockRelease = jest.fn();
 
@@ -16,7 +16,7 @@ describe("PgContext", () => {
   const mockPool: Pool = { connect: mockConnect } as unknown as Pool;
 
   it("client is selected from the pool", async () => {
-    const ctx = new PgContext(mockPool);
+    const ctx = new PostgresContext(mockPool);
     // Act
     ctx.query("SELECT * FROM users", undefined);
 
@@ -25,7 +25,7 @@ describe("PgContext", () => {
   });
 
   it("query is executed", async () => {
-    const ctx = new PgContext(mockPool);
+    const ctx = new PostgresContext(mockPool);
 
     // Act
     const result = await ctx.query("SELECT * FROM users");
@@ -36,7 +36,7 @@ describe("PgContext", () => {
   });
 
   it("client is released back to the pool", async () => {
-    const ctx = new PgContext(mockPool);
+    const ctx = new PostgresContext(mockPool);
     // Act
     ctx.query("SELECT * FROM users", undefined);
 

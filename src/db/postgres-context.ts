@@ -1,11 +1,11 @@
 import { Pool, PoolClient, QueryResult } from "pg";
-import { IPgContext } from "./interfaces";
-import { PoolNotFound, QueryFailed } from "./errors";
+import { DatabaseContext } from "./interfaces";
+import { QueryFailed } from "./errors";
 
 /**
  * Provides utility functions to interact with postgres server using pools
  */
-export class PgContext implements IPgContext {
+export class PostgresContext implements DatabaseContext {
   private readonly _clientPool: Pool;
 
   /**
@@ -26,20 +26,16 @@ export class PgContext implements IPgContext {
     let client: PoolClient | null = null;
 
     try {
-      client = await this.clientPool.connect();
+      client = await this._clientPool.connect();
       const result = await client.query(sql, params);
 
       return result;
-    } catch (error: unknown) {
-      throw new QueryFailed();
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.toString() : "Unknown execution error";
+      throw new QueryFailed(errorMessage);
     } finally {
       if (client) client.release();
     }
-  }
-
-  get clientPool() {
-    if (!this._clientPool) throw new PoolNotFound();
-
-    return this._clientPool;
   }
 }

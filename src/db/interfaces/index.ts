@@ -1,1 +1,1 @@
-export * from "./pg-context.interface";
+export * from "./database-context.interface";

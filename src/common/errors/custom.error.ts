@@ -1,21 +1,21 @@
 export abstract class CustomError extends Error {
   /**
-   * Error's name or code as decribed in the common enums
+   * Error code as described in the common enums
    */
   abstract errorCode: string;
   /**
-   * Timestamp of when the error occured
+   * Error message explaining the error
    */
+  abstract readonly errorMessage: string;
+  /**
+   * Timestamp at which the error occured
+   * */
   abstract readonly timestamp: string;
   /**
-   * Optional status code for the error related to http requests
+   * Optional statusCode which represents the HTTP status code
    */
   readonly statusCode?: number;
 
-  /**
-   * Creates an instance of CustomError
-   * @param {Error} message Optional message to pass to error object
-   */
   constructor(message?: string) {
     super(message);
   }

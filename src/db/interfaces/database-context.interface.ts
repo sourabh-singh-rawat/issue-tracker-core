@@ -1,7 +1,6 @@
-import { Pool, QueryResult } from "pg";
+import { QueryResult } from "pg";
 
-export interface IPgContext {
-  clientPool: Pool;
+export interface DatabaseContext {
   query(sql: string, params: string[]): Promise<QueryResult>;
   // transaction();
   // batch();
