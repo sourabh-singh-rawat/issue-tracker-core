@@ -1,6 +1,6 @@
 {
   "name": "@sourabhrawatcc/core-utils",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "core utilities for issue tracker microservices",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -38,6 +38,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "http-status-codes": "^2.2.0",
     "pg": "^8.11.2",
     "winston": "^3.10.0"
   }

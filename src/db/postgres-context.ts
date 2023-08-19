@@ -1,6 +1,6 @@
 import { Pool, PoolClient, QueryResult } from "pg";
 import { DatabaseContext } from "./interfaces";
-import { QueryFailed } from "./errors";
+import { MissingPoolError, QueryExecutionError } from "./errors";
 
 /**
  * Provides utility functions to interact with postgres server using pools
@@ -13,6 +13,8 @@ export class PostgresContext implements DatabaseContext {
    * @param {Pool} pool The client pool
    */
   constructor(pool: Pool) {
+    if (!pool) throw new MissingPoolError();
+
     this._clientPool = pool;
   }
 
@@ -33,7 +35,8 @@ export class PostgresContext implements DatabaseContext {
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.toString() : "Unknown execution error";
-      throw new QueryFailed(errorMessage);
+
+      throw new QueryExecutionError(errorMessage);
     } finally {
       if (client) client.release();
     }

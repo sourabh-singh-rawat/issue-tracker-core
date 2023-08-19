@@ -1,4 +1,4 @@
-export abstract class CustomError extends Error {
+export abstract class StandardError extends Error {
   /**
    * Error code as described in the common enums
    */
@@ -10,7 +10,7 @@ export abstract class CustomError extends Error {
   /**
    * Timestamp at which the error occured
    * */
-  abstract readonly timestamp: string;
+  readonly timestamp: string;
   /**
    * Optional statusCode which represents the HTTP status code
    */
@@ -18,5 +18,7 @@ export abstract class CustomError extends Error {
 
   constructor(message?: string) {
     super(message);
+
+    this.timestamp = new Date().toISOString();
   }
 }
