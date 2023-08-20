@@ -7,7 +7,7 @@
   "scripts": {
     "test": "jest --watchAll",
     "start": "nodemon ./src/index.ts",
-    "build": "tsc"
+    "prepublish": "tsc"
   },
   "repository": {
     "type": "git",
