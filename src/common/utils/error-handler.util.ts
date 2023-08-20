@@ -1,3 +1,1 @@
-export class ErrorHandler {
-  logError();
-}
+export class ErrorHandler {}
