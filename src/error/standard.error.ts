@@ -21,4 +21,6 @@ export abstract class StandardError extends Error {
 
     this.timestamp = new Date().toISOString();
   }
+
+  abstract serializeError(): { errors: [{ message: string; field?: string }] };
 }

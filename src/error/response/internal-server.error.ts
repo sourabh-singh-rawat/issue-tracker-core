@@ -1,17 +1,15 @@
 import { StatusCodes } from "http-status-codes";
-import { Errors } from "../../enums";
+import { Errors } from "../../common/enums";
 import { ResponseError } from "./response-errors";
 
 export class InternalServerError extends ResponseError {
   errorCode: string;
   errorMessage: string;
-  statusCode?: number | undefined;
 
   constructor(message: string) {
-    super(message);
+    super(message, StatusCodes.INTERNAL_SERVER_ERROR);
 
     this.errorCode = Errors.ERR_INTERNAL_SERVER;
     this.errorMessage = message;
-    this.statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
   }
 }

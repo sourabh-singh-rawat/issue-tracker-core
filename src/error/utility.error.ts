@@ -1,4 +1,4 @@
-import { Errors } from "../enums";
+import { Errors } from "../common/enums";
 import { StandardError } from "./standard.error";
 
 export class UtilityError extends StandardError {
@@ -10,5 +10,9 @@ export class UtilityError extends StandardError {
 
     this.errorCode = Errors.ERR_UTILITY;
     this.errorMessage = message;
+  }
+
+  serializeError(): { errors: [{ message: string; field?: string }] } {
+    return { errors: [{ message: this.errorMessage }] };
   }
 }

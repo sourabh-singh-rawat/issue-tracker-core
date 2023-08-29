@@ -1,4 +1,4 @@
-import { Errors } from "../../enums";
+import { Errors } from "../../common/enums";
 import { ValidationError } from "./validation.error";
 
 export class MissingFieldError extends ValidationError {

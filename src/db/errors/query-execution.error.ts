@@ -1,5 +1,5 @@
 import { Errors } from "../../common/enums/errors.enum";
-import { StandardError } from "../../common/errors/standard.error";
+import { StandardError } from "../../error/standard.error";
 
 export class QueryExecutionError extends StandardError {
   errorCode;
@@ -10,5 +10,9 @@ export class QueryExecutionError extends StandardError {
 
     this.errorCode = Errors.ERR_QUERY_EXECUTION;
     this.errorMessage = message;
+  }
+
+  serializeError(): { errors: [{ message: string; field?: string }] } {
+    return { errors: [{ message: this.errorMessage }] };
   }
 }
