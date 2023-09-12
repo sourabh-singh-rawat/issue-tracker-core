@@ -7,10 +7,10 @@ export class Hash {
    * @param password
    * @param salt
    */
-  private static createWithSalt = async (password: string, salt: Buffer) => {
-    const hashedPassword = await argon2.hash(password, { salt });
+  private static createWithSalt = async (salt: Buffer, plain: string) => {
+    const hash = await argon2.hash(plain, { salt });
 
-    return `${hashedPassword}#${salt.toString("hex")}`;
+    return { hash, salt: salt.toString("hex") };
   };
 
   /**
@@ -18,17 +18,21 @@ export class Hash {
    * @param password password to hash
    * @returns password that is hashed with salt
    */
-  static create = async (password: string): Promise<string> => {
+  static create = async (plain: string) => {
     const salt = randomBytes(32);
 
-    return this.createWithSalt(password, salt);
+    return this.createWithSalt(salt, plain);
   };
 
   /**
    * Verifies
    * @param password
    */
-  static verify = async (password: string, hash: string): Promise<boolean> => {
-    return argon2.verify(hash, password);
+  static verify = async (hash: string, salt: string, plain: string) => {
+    console.log(hash, salt, plain);
+
+    return argon2.verify(hash, plain, {
+      salt: Buffer.from(salt, "hex"),
+    });
   };
 }

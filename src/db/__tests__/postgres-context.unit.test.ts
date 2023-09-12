@@ -1,49 +1,40 @@
-import { Pool } from "pg";
-import { PostgresContext } from "../postgres-context";
+import { PostgresContext } from "../..";
+import { DataSource } from "typeorm";
 
-describe("PostgresContext", () => {
-  // Arrange
-  const mockRelease = jest.fn();
+// Arrange
+const mockDataSource: DataSource = {
+  ...jest.requireActual("typeorm").DataSource.prototype,
+  initialize: jest.fn(),
+  createQueryBuilder: jest.fn(),
+  query: jest.fn(),
+};
 
-  const mockQueryResult = { rows: [], rowCount: 0 };
-  const mockQuery = jest.fn().mockResolvedValue(mockQueryResult);
+const context = new PostgresContext(mockDataSource);
 
-  const mockConnect = jest.fn().mockResolvedValue({
-    query: mockQuery,
-    release: mockRelease,
-  });
-
-  const mockPool: Pool = { connect: mockConnect } as unknown as Pool;
-
-  it("client is selected from the pool", async () => {
-    const ctx = new PostgresContext(mockPool);
-    // Act
-    ctx.query("SELECT * FROM users", undefined);
-
-    // Assert
-    expect(mockConnect).toBeCalled();
-  });
-
-  it("query is executed", async () => {
-    const ctx = new PostgresContext(mockPool);
-
-    // Act
-    const result = await ctx.query("SELECT * FROM users");
-
-    // Assert
-    expect(mockQuery).toBeCalled();
-    expect(result).toBe(mockQueryResult);
-  });
-
-  it("client is released back to the pool", async () => {
-    const ctx = new PostgresContext(mockPool);
-    // Act
-    ctx.query("SELECT * FROM users", undefined);
-
-    // Assert
-    expect(mockRelease).toBeCalled();
-  });
-
-  it.todo("throws a PoolNotFound error if clientPool is not valid");
-  it.todo("throws a QueryFailed error if query execution failed");
+it("can connect with the datasource", async () => {
+  // Act
+  await context.connect();
+  // Assert
+  expect(mockDataSource.initialize).toHaveBeenCalled();
 });
+
+it("execute a sql query", async () => {
+  // Act
+  // context.query("SELECT * FROM user_exists_by_id($1)",  ,["someid"]);
+
+  // Assert
+  expect(mockDataSource.query).toHaveBeenCalled();
+});
+
+it("can create a query builder", async () => {
+  // Act
+  // Assert
+});
+
+it("client is released back to the pool", async () => {
+  // Act
+  // Assert
+});
+
+it.todo("throws a PoolNotFound error if clientPool is not valid");
+it.todo("throws a QueryFailed error if query execution failed");

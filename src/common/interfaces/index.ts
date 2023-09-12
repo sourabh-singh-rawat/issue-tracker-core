@@ -1,1 +1,1 @@
-export * from "./repo-response.interface";
+export * from "./repo-response";

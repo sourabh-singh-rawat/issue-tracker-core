@@ -1,7 +1,22 @@
-import { QueryResult } from "pg";
+import {
+  QueryRunner,
+  ObjectLiteral,
+  EntityTarget,
+  QueryBuilder,
+} from "typeorm";
 
 export interface DatabaseContext {
-  query(sql: string, params: string[]): Promise<QueryResult>;
-  // transaction();
-  // batch();
+  connect(): Promise<void>;
+
+  query<T>(sql: string, params?: string[]): Promise<T[]>;
+
+  queryBuilder<TEntity extends ObjectLiteral>(
+    entityClass: EntityTarget<TEntity>,
+    mainAlias: string,
+    queryRunner?: QueryRunner,
+  ): QueryBuilder<TEntity>;
+
+  transaction<RValue>(
+    callback: (queryRunner: QueryRunner) => RValue,
+  ): Promise<RValue | void>;
 }
