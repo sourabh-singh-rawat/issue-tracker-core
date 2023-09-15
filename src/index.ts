@@ -7,3 +7,5 @@ export * from "./error";
 export * from "./crypto";
 export * from "./db";
 export * from "./auth";
+export * from "./nats";
+export * from "./service-container";

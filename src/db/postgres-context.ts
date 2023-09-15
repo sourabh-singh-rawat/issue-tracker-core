@@ -1,3 +1,4 @@
+import { Logger } from "pino";
 import { DatabaseContext } from "./interfaces";
 import { ConnectionRefusedError, MissingDataSource } from "./errors";
 import {
@@ -12,16 +13,16 @@ import {
  * Provides utility functions to interact with postgres server
  */
 export class PostgresContext implements DatabaseContext {
-  private readonly _dataSource: DataSource;
+  private readonly _logger;
+  private readonly _dataSource;
 
   /**
    * Create a new instance with pool
    */
-  constructor(dataSource: DataSource) {
-    if (!dataSource) {
-      throw new MissingDataSource();
-    }
+  constructor(dataSource: DataSource, logger: Logger) {
+    if (!dataSource) throw new MissingDataSource();
 
+    this._logger = logger;
     this._dataSource = dataSource;
   }
 
@@ -31,8 +32,13 @@ export class PostgresContext implements DatabaseContext {
   connect = async (): Promise<void> => {
     try {
       await this._dataSource.initialize();
+      this._logger.info("Server connected to postgres server");
     } catch (error) {
-      throw new ConnectionRefusedError("Cannot initialize data source");
+      if (error instanceof Error) {
+        this._logger.error(error.toString());
+      }
+
+      throw new ConnectionRefusedError(error!.toString());
     }
   };
 
