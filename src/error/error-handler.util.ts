@@ -8,8 +8,8 @@ export class ErrorHandler {
     request: FastifyRequest,
     reply: FastifyReply,
   ) {
-    console.log(error);
-
+    console.log("-----BEGIN COMMON ERROR-----", error);
+    console.log("-----END COMMON ERROR-----");
     if (error instanceof ResponseError) {
       return reply.status(error.statusCode).send(error.serializeError());
     }

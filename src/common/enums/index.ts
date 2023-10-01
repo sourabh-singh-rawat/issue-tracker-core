@@ -1,2 +1,4 @@
-export * from "./errors.enum";
-export * from "./log-levels.enum";
+export * from "./errors";
+export * from "./log-levels";
+export * from "./workspace-privileges";
+export * from "./workspace-roles";

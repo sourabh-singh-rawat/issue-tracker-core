@@ -1,60 +1,58 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import "@fastify/cookie";
-import { Token } from "../crypto";
-import { JwtPayload } from "jsonwebtoken";
 import { BadRequestError, UnauthorizedError } from "../error";
+import { AccessToken, JwtToken } from "../crypto";
 
 declare module "fastify" {
   interface FastifyRequest {
-    currentUser: string | JwtPayload | null;
+    currentUser: AccessToken;
   }
 }
 
 export class Auth {
-  // preHandler hook to set the current user
   static currentUser = (
-    req: FastifyRequest,
-    res: FastifyReply,
-    next: () => void,
+    request: FastifyRequest,
+    reply: FastifyReply,
+    done: () => void,
   ) => {
-    // gets the accessToken from the cookies
-    const accessToken = req.cookies.accessToken;
+    const accessToken = request.cookies.accessToken;
 
     if (!accessToken) {
-      req.currentUser = null;
-      return next();
+      return done();
     }
 
-    // verify accessToken
     try {
-      req.currentUser = Token.verify(accessToken, process.env.JWT_SECRET!);
+      request.currentUser = JwtToken.verify(
+        accessToken,
+        process.env.JWT_SECRET!,
+      );
     } catch (error) {
-      req.currentUser = null;
+      throw new UnauthorizedError("Token validation failed");
     } finally {
-      next();
+      done();
     }
   };
 
   static requireAuth = (
-    req: FastifyRequest,
-    res: FastifyReply,
-    next: () => void,
+    request: FastifyRequest,
+    reply: FastifyReply,
+    done: () => void,
   ) => {
-    if (!req.currentUser) {
+    if (!request.currentUser) {
       throw new UnauthorizedError();
     }
 
-    next();
+    done();
   };
 
   static requireTokens = (
-    req: FastifyRequest,
-    res: FastifyReply,
-    next: () => void,
+    request: FastifyRequest,
+    reply: FastifyReply,
+    done: () => void,
   ) => {
-    if (!req.cookies.accessToken || !req.cookies.refreshToken) {
+    if (!request.cookies.accessToken || !request.cookies.refreshToken) {
       throw new BadRequestError("Bad request!");
     }
-    next();
+    done();
   };
 }

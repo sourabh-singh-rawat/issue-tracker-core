@@ -18,7 +18,8 @@ export class AwilixServiceContainer<Services>
   }
 
   /**
-   * Adds a service to the services array
+   * Add a service to the container.
+   * Note: These services are not immediately registered to the container. Call connect method to register services
    * @param name
    * @param value
    */
@@ -31,7 +32,7 @@ export class AwilixServiceContainer<Services>
    * @param name - name of the service
    * @param value - class or object value to register
    */
-  register<T>(name: string, value: T): void {
+  private register<T>(name: string, value: T): void {
     this._container.register(name, value as Resolver<T>);
   }
 
@@ -45,7 +46,7 @@ export class AwilixServiceContainer<Services>
   }
 
   /**
-   * Check if a service is registered
+   * Check if a service is already registered to the container
    * @param name
    * @returns
    */
@@ -54,14 +55,15 @@ export class AwilixServiceContainer<Services>
   }
 
   /**
-   * Register all services
+   * Register all the added services to the container
    */
-  connect = async () => {
-    for (const service of this._services) {
-      this._container.register(service.name, service.value);
-    }
+  initialize = async () => {
+    for (let i = 0; i < this._services.length; i++) {
+      const { name, value } = this._services[i];
 
-    this._logger.info("Services registered to the container");
+      this._container.register(name, value);
+    }
+    this._logger.info("Services registered successfully");
   };
 
   /**

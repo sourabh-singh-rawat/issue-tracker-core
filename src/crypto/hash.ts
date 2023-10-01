@@ -29,8 +29,6 @@ export class Hash {
    * @param password
    */
   static verify = async (hash: string, salt: string, plain: string) => {
-    console.log(hash, salt, plain);
-
     return argon2.verify(hash, plain, {
       salt: Buffer.from(salt, "hex"),
     });

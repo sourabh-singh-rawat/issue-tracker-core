@@ -5,8 +5,8 @@ import { ResponseError } from "./response-errors";
 export class UnauthorizedError extends ResponseError {
   errorCode: string;
 
-  constructor() {
-    super("unauthorized", StatusCodes.UNAUTHORIZED);
+  constructor(message: string = "unauthorized") {
+    super(message, StatusCodes.UNAUTHORIZED);
 
     this.errorCode = Errors.ERR_UNAUTHORIZED;
   }
