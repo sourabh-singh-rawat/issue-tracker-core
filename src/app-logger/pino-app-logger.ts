@@ -4,10 +4,7 @@ import { AppLogger } from "./interfaces/app-logger";
 export const logger = pino({
   level: "info",
   timestamp: false,
-  transport: {
-    target: "pino-pretty",
-    options: { colorize: true },
-  },
+  transport: { target: "pino-pretty", options: { colorize: true } },
 });
 
 interface PinoLoggerOptions {
@@ -21,10 +18,7 @@ export class PinoAppLogger implements AppLogger {
     this.logger = pino({
       level,
       timestamp,
-      transport: {
-        target: "pino-pretty",
-        options: { colorize: true },
-      },
+      transport: { target: "pino-pretty", options: { colorize: true } },
     });
   }
 

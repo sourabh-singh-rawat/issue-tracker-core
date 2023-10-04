@@ -3,10 +3,10 @@ export interface UserDetailsInput {
   email: string;
   displayName?: string;
   isEmailVerified: boolean;
+  defaultWorkspaceId: string;
   createdAt: Date;
   photoUrl?: string;
   description?: string;
-  defaultWorkspaceId?: string;
 }
 
 export class UserDetails {
@@ -14,10 +14,10 @@ export class UserDetails {
   public email: string;
   public displayName?: string;
   public isEmailVerified: boolean;
+  public defaultWorkspaceId: string;
   public createdAt: Date;
   public photoUrl?: string;
   public description?: string;
-  public defaultWorkspaceId?: string;
   constructor(inputs: UserDetailsInput) {
     this.userId = inputs.userId;
     this.email = inputs.email;

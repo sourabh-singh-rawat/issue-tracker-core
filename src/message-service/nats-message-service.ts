@@ -1,30 +1,28 @@
 import { Logger } from "pino";
-import { ConnectionOptions, NatsConnection, connect } from "nats";
+import { ConnectionOptions, NatsConnection } from "nats";
 import { MessageService } from "./interfaces/message-service";
 
 export class NatsMessageService implements MessageService {
-  private readonly _logger;
-  private readonly _connectionOptions;
-  private _client?: NatsConnection;
+  private readonly logger;
+  private readonly connectionOptions;
+  private readonly connection;
+  public client?: NatsConnection;
 
-  constructor(options: ConnectionOptions, logger: Logger) {
-    this._logger = logger;
-    this._connectionOptions = options;
+  constructor(
+    connection: (opts?: ConnectionOptions) => Promise<NatsConnection>,
+    connectionOptions: ConnectionOptions,
+    logger?: Logger,
+  ) {
+    this.logger = logger;
+    this.connection = connection;
+    this.connectionOptions = connectionOptions;
   }
 
   // Connects to the nats client using connection options
   connect = async () => {
-    const natsClient = await connect(this._connectionOptions);
-    this._client = natsClient;
+    const client = await this.connection(this.connectionOptions);
+    this.client = client;
 
-    this._logger.info(`Server connected to ${natsClient.info?.server_name}`);
+    this.logger?.info(`Server connected to ${client.info?.server_name}`);
   };
-
-  public get client() {
-    if (!this._client) {
-      throw new Error("Client not connected");
-    }
-
-    return this._client;
-  }
 }

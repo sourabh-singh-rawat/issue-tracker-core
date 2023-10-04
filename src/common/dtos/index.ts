@@ -5,3 +5,5 @@ export * from "./user-details";
 export * from "./tokens";
 export * from "./user";
 export * from "./service-response";
+export * from "./project-registration-data";
+export * from "./workspace-registration-data";

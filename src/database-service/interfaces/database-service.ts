@@ -7,16 +7,15 @@ import {
 
 export interface DatabaseService {
   connect(): Promise<void>;
-
   query<T>(sql: string, params?: string[]): Promise<T[]>;
-
-  queryBuilder<TEntity extends ObjectLiteral>(
+  createQueryBuilder<TEntity extends ObjectLiteral>(
     entity: EntityTarget<TEntity>,
     mainAlias: string,
     queryRunner?: QueryRunner,
   ): QueryBuilder<TEntity>;
-
+  createQueryRunner(): QueryRunner;
   transaction<RValue>(
+    queryRunner: QueryRunner,
     callback: (queryRunner: QueryRunner) => RValue,
-  ): Promise<RValue>;
+  ): Promise<RValue | null>;
 }

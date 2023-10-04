@@ -9,7 +9,9 @@ export abstract class Subscriber<T> {
   abstract readonly stream: Streams;
   abstract readonly consumer: Consumers;
 
-  constructor(client: NatsConnection) {
+  constructor(client?: NatsConnection) {
+    if (!client) throw Error("client must be specified");
+
     this._jetstreamClient = client.jetstream();
   }
 

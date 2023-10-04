@@ -1,13 +1,7 @@
 import { Logger } from "pino";
 import { DatabaseService } from "./interfaces";
 import { ConnectionRefusedError, MissingDataSource } from "./errors";
-import {
-  DataSource,
-  QueryRunner,
-  EntityTarget,
-  ObjectLiteral,
-  QueryBuilder,
-} from "typeorm";
+import { DataSource, QueryRunner, EntityTarget, ObjectLiteral } from "typeorm";
 
 export class PostgresService implements DatabaseService {
   private readonly logger;
@@ -29,6 +23,7 @@ export class PostgresService implements DatabaseService {
       await this.dataSource.initialize();
       this.logger.info("Server connected to postgres cluster");
     } catch (error) {
+      console.log(error);
       throw new ConnectionRefusedError(error!.toString());
     }
   };
@@ -47,16 +42,20 @@ export class PostgresService implements DatabaseService {
    * Creates a query builder with dataSource for a given entity and name.
    * @returns
    */
-  queryBuilder = <TEntity extends ObjectLiteral>(
+  createQueryBuilder = <TEntity extends ObjectLiteral>(
     entityClass: EntityTarget<TEntity>,
     mainAlias: string,
     queryRunner?: QueryRunner,
-  ): QueryBuilder<TEntity> => {
+  ) => {
     return this.dataSource.createQueryBuilder<TEntity>(
       entityClass,
       mainAlias,
       queryRunner,
     );
+  };
+
+  createQueryRunner = () => {
+    return this.dataSource.createQueryRunner();
   };
 
   /**
@@ -65,23 +64,23 @@ export class PostgresService implements DatabaseService {
    * @returns
    */
   transaction = async <TReturnValue>(
+    queryRunner: QueryRunner,
     callback: (queryRunner: QueryRunner) => TReturnValue,
-  ): Promise<TReturnValue> => {
-    const queryRunner = this.dataSource.createQueryRunner();
+  ): Promise<TReturnValue | null> => {
     await queryRunner.connect();
     await queryRunner.startTransaction();
 
-    let returnValue;
+    let returnValue = null;
     try {
       returnValue = await callback(queryRunner);
 
       await queryRunner.commitTransaction();
-      return returnValue;
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      throw new Error(error!.toString());
+      throw error;
     } finally {
       await queryRunner.release();
     }
+    return returnValue;
   };
 }

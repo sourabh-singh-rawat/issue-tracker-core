@@ -10,27 +10,16 @@ declare module "fastify" {
 }
 
 export class Auth {
-  static currentUser = (
+  static setCurrentUser = (
     request: FastifyRequest,
     reply: FastifyReply,
     done: () => void,
   ) => {
     const accessToken = request.cookies.accessToken;
+    if (!accessToken) return done();
 
-    if (!accessToken) {
-      return done();
-    }
-
-    try {
-      request.currentUser = JwtToken.verify(
-        accessToken,
-        process.env.JWT_SECRET!,
-      );
-    } catch (error) {
-      throw new UnauthorizedError("Token validation failed");
-    } finally {
-      done();
-    }
+    request.currentUser = JwtToken.verify(accessToken, process.env.JWT_SECRET!);
+    return done();
   };
 
   static requireAuth = (
@@ -42,7 +31,7 @@ export class Auth {
       throw new UnauthorizedError();
     }
 
-    done();
+    return done();
   };
 
   static requireTokens = (
@@ -53,6 +42,7 @@ export class Auth {
     if (!request.cookies.accessToken || !request.cookies.refreshToken) {
       throw new BadRequestError("Bad request!");
     }
-    done();
+
+    return done();
   };
 }

@@ -8,7 +8,9 @@ export abstract class Publisher<T extends Message> {
   abstract subject: T["subject"];
   private readonly _jetstreamClient;
 
-  constructor(client: NatsConnection) {
+  constructor(client?: NatsConnection) {
+    if (!client) throw Error("client must be specified");
+
     this._jetstreamClient = client.jetstream();
   }
 
