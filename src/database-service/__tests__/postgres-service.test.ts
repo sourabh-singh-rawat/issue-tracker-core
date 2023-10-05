@@ -86,7 +86,7 @@ it("client is released back to the pool on error", async () => {
   try {
     await databaseService.transaction(mockQueryRunner, errorCallback);
   } catch (error) {
-    console.log(error);
+    // ignore
   }
 
   expect(mockQueryRunner.release).toHaveBeenCalled();

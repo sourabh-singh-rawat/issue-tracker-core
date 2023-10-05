@@ -5,18 +5,18 @@ import { Streams, Consumers } from "./enums";
  * Subscriber that consumers a particular consumer.
  */
 export abstract class Subscriber<T> {
-  private readonly _jetstreamClient;
+  private readonly jetstreamClient;
   abstract readonly stream: Streams;
   abstract readonly consumer: Consumers;
 
   constructor(client?: NatsConnection) {
     if (!client) throw Error("client must be specified");
 
-    this._jetstreamClient = client.jetstream();
+    this.jetstreamClient = client.jetstream();
   }
 
   fetchMessages = async () => {
-    const consumer = await this._jetstreamClient.consumers.get(
+    const consumer = await this.jetstreamClient.consumers.get(
       this.stream,
       this.consumer,
     );

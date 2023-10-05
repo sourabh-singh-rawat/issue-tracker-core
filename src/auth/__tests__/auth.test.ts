@@ -17,7 +17,7 @@ const mockCurrentUser = {
   iss: "",
   aud: "",
   sub: "",
-  exp: 1000000000000000,
+  exp: 1000000000000,
   jwtid: "",
 };
 const mockRequest = {
@@ -30,9 +30,15 @@ afterEach(() => {
   jest.clearAllMocks();
 });
 
-it("sets currentUser to undefined if no accessToken provided and calls done", async () => {
+it("must never throw exception", async () => {
+  expect(() =>
+    Auth.setCurrentUser(mockRequest, mockReply, mockDone),
+  ).not.toThrowError();
+});
+
+it("does not set current user if not access token is provided", async () => {
   Auth.setCurrentUser(mockRequest, mockReply, mockDone);
-  expect(mockRequest.currentUser).toBeUndefined();
+  expect(mockRequest.currentUser).toBeFalsy();
   expect(mockDone).toHaveBeenCalled();
 });
 
@@ -63,8 +69,8 @@ it("throws error for missing access or refresh token", async () => {
 });
 
 it("calls done, if access and refresh token are present", async () => {
-  mockRequest.cookies.accessToken = "access_token";
-  mockRequest.cookies.refreshToken = "refresh_token";
+  mockRequest.cookies.accessToken = "fake_access_token";
+  mockRequest.cookies.refreshToken = "fake_refresh_token";
 
   Auth.requireTokens(mockRequest, mockReply, mockDone);
 

@@ -4,6 +4,7 @@ export interface UserDetailsInput {
   displayName?: string;
   isEmailVerified: boolean;
   defaultWorkspaceId: string;
+  defaultWorkspaceName: string;
   createdAt: Date;
   photoUrl?: string;
   description?: string;
@@ -15,6 +16,7 @@ export class UserDetails {
   public displayName?: string;
   public isEmailVerified: boolean;
   public defaultWorkspaceId: string;
+  public defaultWorkspaceName: string;
   public createdAt: Date;
   public photoUrl?: string;
   public description?: string;
@@ -27,5 +29,6 @@ export class UserDetails {
     this.photoUrl = inputs.photoUrl;
     this.description = inputs.description;
     this.defaultWorkspaceId = inputs.defaultWorkspaceId;
+    this.defaultWorkspaceName = inputs.defaultWorkspaceName;
   }
 }

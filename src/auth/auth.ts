@@ -16,9 +16,17 @@ export class Auth {
     done: () => void,
   ) => {
     const accessToken = request.cookies.accessToken;
-    if (!accessToken) return done();
+    if (accessToken) {
+      try {
+        request.currentUser = JwtToken.verify(
+          accessToken,
+          process.env.JWT_SECRET!,
+        );
+      } catch (error) {
+        // ignore
+      }
+    }
 
-    request.currentUser = JwtToken.verify(accessToken, process.env.JWT_SECRET!);
     return done();
   };
 

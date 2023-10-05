@@ -6,17 +6,17 @@ import { Message } from "../common/interfaces/message";
  */
 export abstract class Publisher<T extends Message> {
   abstract subject: T["subject"];
-  private readonly _jetstreamClient;
+  private readonly jetstreamClient;
 
   constructor(client?: NatsConnection) {
     if (!client) throw Error("client must be specified");
 
-    this._jetstreamClient = client.jetstream();
+    this.jetstreamClient = client.jetstream();
   }
 
   publish = async (message: T["payload"]) => {
     const codec = JSONCodec<T["payload"]>();
-    await this._jetstreamClient.publish(this.subject, codec.encode(message));
+    await this.jetstreamClient.publish(this.subject, codec.encode(message));
 
     console.log(`Message published on ${this.subject} to stream`);
   };

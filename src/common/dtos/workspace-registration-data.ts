@@ -7,7 +7,7 @@ export interface WorkspaceRegistrationDataInputs {
 export class WorkspaceRegistrationData {
   name;
   id?;
-  description?: string;
+  description?;
 
   constructor({ name, id, description }: WorkspaceRegistrationDataInputs) {
     this.name = name;
