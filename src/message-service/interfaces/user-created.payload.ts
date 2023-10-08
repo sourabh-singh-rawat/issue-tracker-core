@@ -2,4 +2,5 @@ export interface UserCreatedPayload {
   userId: string;
   email: string;
   defaultWorkspaceId: string;
+  isEmailVerified: boolean;
 }

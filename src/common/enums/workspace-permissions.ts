@@ -1,6 +1,6 @@
 export enum WorkspacePermissions {
-  CreateProject = "workspace:create-project",
+  Create = "workspace:create",
   View = "workspace:view",
   Edit = "workspace:edit",
-  Delete = "workspace:delete",
+  Archive = "workspace:archive",
 }

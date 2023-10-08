@@ -2,4 +2,8 @@ export * from "./errors";
 export * from "./log-levels";
 export * from "./workspace-permissions";
 export * from "./workspace-roles";
+export * from "./project-permissions";
+export * from "./project-roles";
 export * from "./project-status";
+export * from "./issue-roles";
+export * from "./issue-permissions";

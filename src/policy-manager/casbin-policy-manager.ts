@@ -4,6 +4,7 @@ import { DataSource } from "typeorm";
 import { TypeORMAdapterConfig } from "typeorm-adapter/lib/adapter";
 import { Logger } from "pino";
 import { Enforcer, newEnforcer } from "casbin";
+import { FastifyReply, FastifyRequest } from "fastify";
 
 export abstract class CasbinPolicyManager<A extends string>
   implements PolicyManager<A>
@@ -78,4 +79,10 @@ export abstract class CasbinPolicyManager<A extends string>
 
     return this.enforcer.enforceSync(userId, resourceId, actionId);
   };
+
+  abstract hasViewPermission(
+    request: FastifyRequest<{ Params: { id: string } }>,
+    reply: FastifyReply,
+    done: () => void,
+  ): void;
 }

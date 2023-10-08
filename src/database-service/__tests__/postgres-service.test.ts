@@ -8,7 +8,7 @@ const mockLogger: Logger = {
 };
 
 const dataSource: DataSource = {
-  ...jest.requireActual("typeorm").DataSouce,
+  ...jest.requireActual("typeorm").DataSource,
   initialize: jest.fn(),
   createQueryBuilder: jest.fn(),
   createQueryRunner: jest.fn(),
