@@ -3,4 +3,7 @@ export interface UserCreatedPayload {
   email: string;
   defaultWorkspaceId: string;
   isEmailVerified: boolean;
+  displayName: string;
+  photoUrl?: string;
+  inviteToken?: string;
 }

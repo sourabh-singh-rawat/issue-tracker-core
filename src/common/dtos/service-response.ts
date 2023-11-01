@@ -1,14 +1,17 @@
 export interface ServiceResponseInputs<T> {
-  data: T;
-  dataCount?: number;
+  rows: T;
+  rowCount?: number;
+  filteredRowCount?: number;
 }
 
 export class ServiceResponse<T> {
-  data: T;
-  dataCount?: number;
+  rows: T;
+  rowCount?: number;
+  filteredRowCount?: number;
 
-  constructor({ data, dataCount }: ServiceResponseInputs<T>) {
-    this.data = data;
-    this.dataCount = dataCount;
+  constructor({ rows, rowCount, filteredRowCount }: ServiceResponseInputs<T>) {
+    this.rows = rows;
+    this.rowCount = rowCount;
+    this.filteredRowCount = filteredRowCount;
   }
 }

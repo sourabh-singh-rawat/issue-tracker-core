@@ -1,15 +1,14 @@
 import { Errors } from "../common/enums";
 import { StandardError } from "./standard.error";
 
-export class VersionMismatchError extends StandardError {
+export class EmailAlreadySentError extends StandardError {
   errorCode: string;
   errorMessage: string;
 
   constructor() {
     super();
-
-    this.errorCode = Errors.ERR_VERSION_MISMATCH;
-    this.errorMessage = "Version mismatch";
+    this.errorCode = Errors.ERR_EMAIL_ALREADY_SENT;
+    this.errorMessage = "Email already sent";
   }
 
   serializeError(): { errors: [{ message: string; field?: string }] } {

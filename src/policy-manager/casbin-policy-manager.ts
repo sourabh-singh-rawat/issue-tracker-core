@@ -1,88 +1,121 @@
-import TypeORMAdapter from "typeorm-adapter";
-import { PolicyManager } from "./interfaces/policy-manager";
-import { DataSource } from "typeorm";
-import { TypeORMAdapterConfig } from "typeorm-adapter/lib/adapter";
 import { Logger } from "pino";
+import { DataSource } from "typeorm";
+import TypeORMAdapter from "typeorm-adapter";
 import { Enforcer, newEnforcer } from "casbin";
 import { FastifyReply, FastifyRequest } from "fastify";
+import { TypeORMAdapterConfig } from "typeorm-adapter/lib/adapter";
+import { PolicyManager } from "./interfaces/policy-manager";
+import { MissingEnforcerError } from "../error/missing-enforcer.error";
 
 export abstract class CasbinPolicyManager<A extends string>
-  implements PolicyManager<A>
+  implements PolicyManager
 {
-  private readonly logger;
-  enforcer?: Enforcer;
-  private policies: { subject: string; object: string; action: string }[] = [];
-  private groupingPolicies: { parent: string; child: string }[] = [];
+  private casbinEnforcer?: Enforcer;
 
-  constructor(logger: Logger) {
-    this.logger = logger;
-  }
+  constructor(private logger: Logger) {}
 
-  // Should initialize the connected using adapter and create enforcer
+  /**
+   * Saves the policy to database
+   * @param subject
+   * @param object
+   * @param action
+   * @returns
+   */
+  savePolicy = async (subject: string, object: string, action: string) => {
+    return await this.enforcer.addPolicy(subject, object, action);
+  };
+
+  /**
+   * Saves the inheritence rule to database
+   * @param parent
+   * @param child
+   */
+  saveGroupingPolicy = async (parent: string, child: string) => {
+    await this.enforcer.addGroupingPolicy(parent, child);
+  };
+
+  /**
+   * Save role for the user
+   * @param userId
+   * @param roleId
+   * @returns
+   */
+  saveRoleForUser = async (userId: string, roleId: string) => {
+    return await this.enforcer.addRoleForUser(userId, roleId);
+  };
+
+  /**
+   * Get role for the user on a object
+   * @param userId
+   * @param object
+   * @returns
+   */
+  getRoleForUser = async (userId: string, object: string) => {
+    const roles = await this.enforcer.getRolesForUser(userId);
+    const role = roles.find((role) => role.includes(object));
+
+    if (!role) throw new Error("No role found for user");
+
+    return role;
+  };
+
+  /**
+   * Get all permission for user on a object
+   * @param userId
+   * @param object
+   * @returns
+   */
+  getPermissionsForUser = async (userId: string, object: string) => {
+    const userRole = await this.getRoleForUser(userId, object);
+
+    return await this.enforcer?.getImplicitPermissionsForUser(userRole);
+  };
+
+  /**
+   *
+   * @param userId
+   * @param resourceId
+   * @param actionId
+   * @returns
+   */
+  enforce = (userId: string, resourceId: string, actionId: A) => {
+    return this.enforcer.enforceSync(userId, resourceId, actionId);
+  };
+
+  /**
+   * Initializes the enforcer and saves the default policies
+   * @param dataSource
+   * @param config
+   */
   initialize = async (dataSource: DataSource, config: TypeORMAdapterConfig) => {
     const adapter = await TypeORMAdapter.newAdapter(
       { connection: dataSource.manager.connection },
       { customCasbinRuleEntity: config.customCasbinRuleEntity },
     );
 
-    this.enforcer = await newEnforcer("./src/app/model.conf", adapter);
-    this.enforcer.enableLog(true);
-
-    for (let i = 0; i < this.policies.length; i++) {
-      const { subject, object, action } = this.policies[i];
-
-      await this.savePolicy(subject, object, action);
-    }
-
-    for (let i = 0; i < this.groupingPolicies.length; i++) {
-      const { parent, child } = this.groupingPolicies[i];
-      await this.saveGroupingPolicy(parent, child);
-    }
-    this.logger.info("Initialized with policy manager");
+    this.casbinEnforcer = await newEnforcer("./src/app/model.conf", adapter);
+    this.logger.info("Initialized policy manager and connected to database");
   };
 
-  // Adds a policy to the casbin policy manager
-  // Note: initialize saves the policies to the database
-  addPolicy = (subject: string, object: string, action: string) => {
-    this.policies.push({ subject, object, action });
-  };
-
-  // Save the policies to the database
-  savePolicy = async (subject: string, object: string, action: string) => {
-    if (!this.enforcer) throw new Error("Enforcer not available");
-
-    return await this.enforcer.addPolicy(subject, object, action);
-  };
-
-  // Adds a grouping policy to casbin policy manager
-  addGroupingPolicy = (parent: string, child: string) => {
-    this.groupingPolicies.push({ parent, child });
-  };
-
-  // Saves the grouping policy to database
-  saveGroupingPolicy = async (parent: string, child: string) => {
-    if (!this.enforcer) throw new Error("Enforcer not available");
-
-    await this.enforcer.addGroupingPolicy(parent, child);
-  };
-
-  // Add permission for user on a specific resource
-  saveRoleForUser = async (userId: string, roleId: string) => {
-    if (!this.enforcer) throw new Error("Enforcer not available");
-
-    return await this.enforcer.addRoleForUser(userId, roleId);
-  };
-
-  // Enforce permission for user
-  enforce = (userId: string, resourceId: string, actionId: A) => {
-    if (!this.enforcer) throw new Error("Enforcer not available");
-
-    return this.enforcer.enforceSync(userId, resourceId, actionId);
-  };
-
+  /**
+   * Abstract function to check if the user is allowed to view resouce
+   * @param request
+   * @param reply
+   * @param done
+   */
   abstract hasViewPermission(
     request: FastifyRequest<{ Params: { id: string } }>,
     reply: FastifyReply,
     done: () => void,
   ): void;
+
+  /**
+   * Enforcer getter
+   */
+
+  public get enforcer() {
+    if (!this.casbinEnforcer) throw new MissingEnforcerError();
+
+    return this.casbinEnforcer;
+  }
 }

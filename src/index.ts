@@ -5,6 +5,7 @@ export * from "./common/dtos";
 export * from "./common/entity";
 export * from "./common/enums";
 export * from "./common/interfaces";
+export * from "./mail-service";
 export * from "./crypto";
 export * from "./policy-manager";
 export * from "./database-service";

@@ -1,4 +1,4 @@
-import { DataSource, EntityTarget, ObjectLiteral, QueryRunner } from "typeorm";
+import { DataSource, QueryRunner } from "typeorm";
 import { PostgresService } from "../postgres-service";
 import { Logger } from "pino";
 
@@ -24,10 +24,6 @@ const mockQueryRunner: QueryRunner = {
   release: jest.fn(),
 };
 
-const mockEntityClass: EntityTarget<ObjectLiteral> = {
-  ...jest.requireActual("typeorm").EntityTarget,
-};
-
 jest.clearAllMocks();
 
 const databaseService = new PostgresService(dataSource, mockLogger);
@@ -43,7 +39,7 @@ it("can execute a sql query", async () => {
 });
 
 it("can create a query builder", async () => {
-  databaseService.createQueryBuilder(mockEntityClass, "test", mockQueryRunner);
+  databaseService.createQueryBuilder(mockQueryRunner);
   expect(dataSource.createQueryBuilder).toHaveBeenCalled();
 });
 

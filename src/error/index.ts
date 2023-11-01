@@ -10,3 +10,5 @@ export * from "./user-already-exists.error";
 export * from "./user-not-found.error";
 export * from "./user-profile-not-found.error";
 export * from "./version-missmatch.error";
+export * from "./missing-sender.error";
+export * from "./email-already-sent.error";

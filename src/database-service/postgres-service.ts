@@ -1,7 +1,7 @@
 import { Logger } from "pino";
 import { DatabaseService } from "./interfaces";
 import { ConnectionRefusedError, MissingDataSource } from "./errors";
-import { DataSource, QueryRunner, EntityTarget, ObjectLiteral } from "typeorm";
+import { DataSource, EntityTarget, ObjectLiteral, QueryRunner } from "typeorm";
 
 export class PostgresService implements DatabaseService {
   private readonly logger;
@@ -18,7 +18,7 @@ export class PostgresService implements DatabaseService {
    * Initializes the connection to the postgres cluster
    * Must have an data source
    */
-  connect = async (): Promise<void> => {
+  connect = async () => {
     try {
       await this.dataSource.initialize();
       this.logger.info("Server connected to postgres cluster");
@@ -34,24 +34,30 @@ export class PostgresService implements DatabaseService {
    * @param params The parameters to query
    * @returns Result object
    */
-  query = async <T>(sql: string, params?: string[]): Promise<T[]> => {
-    return await this.dataSource.query<T[]>(sql, params);
+  query = async <T extends ObjectLiteral>(
+    sql: string,
+    params?: (string | number | undefined)[],
+  ) => {
+    const result = await this.dataSource.query<T[]>(sql, params);
+    const { default: camelCaseKeys } = await import("camelcase-keys");
+
+    return camelCaseKeys(result, { deep: true });
   };
 
   /**
    * Creates a query builder with dataSource for a given entity and name.
    * @returns
    */
-  createQueryBuilder = <TEntity extends ObjectLiteral>(
-    entityClass: EntityTarget<TEntity>,
-    mainAlias: string,
+  createQueryBuilder = (queryRunner?: QueryRunner) => {
+    return this.dataSource.createQueryBuilder(queryRunner);
+  };
+
+  createDeleteQueryBuilder = <Entity extends ObjectLiteral>(
+    entityClass: EntityTarget<Entity>,
+    alias: string,
     queryRunner?: QueryRunner,
   ) => {
-    return this.dataSource.createQueryBuilder<TEntity>(
-      entityClass,
-      mainAlias,
-      queryRunner,
-    );
+    return this.dataSource.createQueryBuilder(entityClass, alias, queryRunner);
   };
 
   createQueryRunner = () => {

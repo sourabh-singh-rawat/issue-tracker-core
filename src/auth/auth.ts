@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import "@fastify/cookie";
-import { BadRequestError, UnauthorizedError } from "../error";
+import { BadRequestError, ForbiddenError, UnauthorizedError } from "../error";
 import { AccessToken, JwtToken } from "../crypto";
 
 declare module "fastify" {
@@ -10,6 +10,18 @@ declare module "fastify" {
 }
 
 export class Auth {
+  static requireTokens = (
+    request: FastifyRequest,
+    reply: FastifyReply,
+    done: () => void,
+  ) => {
+    if (!request.cookies.accessToken || !request.cookies.refreshToken) {
+      throw new BadRequestError("Bad request!");
+    }
+
+    return done();
+  };
+
   static setCurrentUser = (
     request: FastifyRequest,
     reply: FastifyReply,
@@ -42,13 +54,15 @@ export class Auth {
     return done();
   };
 
-  static requireTokens = (
+  static requireNoAuth = (
     request: FastifyRequest,
     reply: FastifyReply,
     done: () => void,
   ) => {
-    if (!request.cookies.accessToken || !request.cookies.refreshToken) {
-      throw new BadRequestError("Bad request!");
+    if (request.currentUser) {
+      throw new ForbiddenError(
+        "Registration not allowed for authenticated users.",
+      );
     }
 
     return done();
